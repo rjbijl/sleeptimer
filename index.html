@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content=
+    "width=device-width, initial-scale=1.0">
+    <title>Digital Clock</title>
+    <style>
+		body {
+			background-color: black;
+		}	
+		#clock {
+		font-family: sans-serif;
+		color: red;
+		font-size: 275px;
+		width: 100%;
+		text-align: center;
+			  
+		position: fixed; /* or absolute */
+		top: 50%;
+		left: 50%;
+		/* bring your own prefixes */
+		transform: translate(-50%, -50%);	  
+		/*	  display: flex;
+			  height: 100vh;
+		  justify-content: center;
+		  align-items: center;*/
+		}
+
+		#clock.time-to-wake {
+			color: #73f211;
+		}
+	</style>
+</head>
+<body>
+    <div id="clock">08:00</div>
+ 
+    <script>
+	
+	// BC replacement for URLSearchParams
+	var queryParams = window.location.search.substr(1).split('&').reduce(function (qs, query) {
+	  var chunks = query.split('=');
+	  var key = chunks[0];
+	  var value = decodeURIComponent(chunks[1] || '');
+	  var valueLower = value.trim().toLowerCase();
+	  if (valueLower === 'true' || value === 'false') {
+		value = Boolean(value);
+	  } else if (!isNaN(Number(value))) {
+		value = Number(value);
+	  }
+	  return (qs[key] = value, qs);
+	}, {});
+
+    let wakeTime = queryParams.time;
+	if (!wakeTime) {
+		wakeTime = '07:30';
+	}
+
+	setInterval(showTime, 10000);
+	function showTime() {
+		const time = new Date();
+		const hour = time.getHours();
+		const min = time.getMinutes();
+
+		const wakeTimeParts = wakeTime.split(':');
+		
+		const matchHour = parseInt(wakeTimeParts[0]);
+		const matchMinutes = parseInt(wakeTimeParts[1]);
+
+		if (
+			(matchHour == hour && min >= matchMinutes)
+			|| (hour > matchHour && hour < 18)
+		) {
+			document.getElementById("clock").classList.add("time-to-wake");
+		}
+		
+		const currentTime = (hour < 10 ? "0" + hour : hour) + ":" + (min < 10 ? "0" + min : min);
+
+		document.getElementById("clock").innerHTML = currentTime;
+	}
+	showTime();
+
+</script>
+</body>
+</html>
